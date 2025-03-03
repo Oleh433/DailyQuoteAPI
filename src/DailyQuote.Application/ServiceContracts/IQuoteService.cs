@@ -5,15 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DailyQuote.Domain.RepositoryContracts
+namespace DailyQuote.Application.ServiceContracts
 {
-    public interface IQuoteRepository
+    public interface IQuoteService
     {
         Task<List<Quote>> GetAllQuotesAsync();
         Task<Quote?> GetQuoteByQuoteIdAsync(Guid quoteId);
         Task AddQuoteAsync(Quote quote);
         Task DeleteQuoteAsync(Quote quote);
-        Task<Quote?> GetRandomQuoteAsync(int quoteNumber);
-        Task<int> GetRecordsCountAsync();
+        Task<Quote> GetRandomQuoteAsync();
     }
 }
