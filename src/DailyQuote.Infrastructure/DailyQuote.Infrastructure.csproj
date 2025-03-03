@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.13" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.13" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\DailyQuote.Application\DailyQuote.Application.csproj" />
     <ProjectReference Include="..\DailyQuote.Domain\DailyQuote.Domain.csproj" />
   </ItemGroup>
