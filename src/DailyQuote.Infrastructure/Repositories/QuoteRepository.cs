@@ -1,53 +1,65 @@
 ﻿using DailyQuote.Domain.Entities;
 using DailyQuote.Domain.RepositoryContracts;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DailyQuote.Infrastructure.Repositories
 {
     public class QuoteRepository : IQuoteRepository
     {
-        private readonly ApplicationDbContext _db;
+        private readonly ApplicationDbContext _dbContext;
 
         public QuoteRepository(ApplicationDbContext applicationDbContext)
         {
-            _db = applicationDbContext;
+            _dbContext = applicationDbContext;
         }
 
-        public async Task<List<Quote>> GetAllQuotesAsync()
+        public async Task<IEnumerable<Quote>> GetAllAsync()
         {
-            return await _db.Quotes.ToListAsync();
+            return await _dbContext.Quotes.ToListAsync();
         }
 
-        public async Task<Quote?> GetQuoteByQuoteIdAsync(Guid quoteId)
+        public async Task<Quote?> GetByIdAsync(Guid quoteId)
         {
-            return await _db.Quotes.FirstOrDefaultAsync(quote => quote.QuoteId == quoteId);
+            return await _dbContext.Quotes
+                .FindAsync(keyValues: [quoteId]);
         }
 
-        public async Task AddQuoteAsync(Quote quote)
+        public async Task AddAsync(Quote quote)
         {
-            _db.Quotes.Add(quote);
-            await _db.SaveChangesAsync();
+            await _dbContext.Quotes.AddAsync(quote);
+
+            await _dbContext.SaveChangesAsync();
         }
 
-        public async Task DeleteQuoteAsync(Quote quote)
+        public async Task DeleteAsync(Quote quote)
         {
-            _db.Quotes.Remove(quote);
-            await _db.SaveChangesAsync();
+            _dbContext.Quotes.Remove(quote);
+
+            await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<Quote?> GetRandomQuoteAsync(int quoteNumber)
+        public async Task<IEnumerable<Quote>> GetRandomAsync(int amount = 1)
         {
-            return await _db.Quotes.Skip(quoteNumber).FirstOrDefaultAsync();
+            var sql = """
+                SELECT TOP ({0}) *
+                FROM {1}
+                ORDER BY NEWID();
+            """;
+
+            var formattedSql = string.Format(
+                sql,
+                amount,
+                nameof(ApplicationDbContext.Quotes));
+
+            return await _dbContext.Quotes
+                .FromSqlRaw(formattedSql)
+                .ToListAsync();
         }
 
         public async Task<int> GetRecordsCountAsync()
         {
-            return await _db.Quotes.CountAsync();
+            return await _dbContext.Quotes
+                .CountAsync();
         }
     }
 }

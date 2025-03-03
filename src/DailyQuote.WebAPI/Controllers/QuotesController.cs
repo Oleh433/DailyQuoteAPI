@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DailyQuote.WebAPI.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/quotes")]
     public class QuotesController : Controller
     {
         private readonly IQuoteService _quoteService;
@@ -14,7 +14,7 @@ namespace DailyQuote.WebAPI.Controllers
             _quoteService = quoteService;
         }
 
-        [Route("[action]")]
+        [HttpGet("random")]
         public async Task<IActionResult> Random()
         {
             QuoteResponse quote = await _quoteService.GetRandomQuoteAsync();
@@ -22,18 +22,20 @@ namespace DailyQuote.WebAPI.Controllers
             return Json(quote);
         }
 
-        [Route("[action]")]
         [HttpPost]
-        public async Task Quotes(QuoteAddRequest quoteAddRequest)
+        public async Task<IActionResult> Quotes(QuoteAddRequest quoteAddRequest)
         {
             await _quoteService.AddQuoteAsync(quoteAddRequest);
+
+            return Created();
         }
 
-        [Route("[action]")]
-        [HttpPost]
-        public async Task DeleteQuote(QuoteDeleteRequest quoteDeleteRequest)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteQuote(Guid quoteId)
         {
-            await _quoteService.DeleteQuoteAsync(quoteDeleteRequest);
+            await _quoteService.DeleteQuoteAsync(quoteId);
+
+            return NoContent();
         }
     }
 }

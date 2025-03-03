@@ -1,5 +1,8 @@
-
+using DailyQuote.Application.ServiceContracts;
+using DailyQuote.Application.Services;
+using DailyQuote.Domain.RepositoryContracts;
 using DailyQuote.Infrastructure;
+using DailyQuote.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace DailyQuote.WebAPI
@@ -10,10 +13,12 @@ namespace DailyQuote.WebAPI
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            builder.Services.AddScoped<IQuoteRepository, QuoteRepository>();
+
+            builder.Services.AddScoped<IQuoteService, QuoteService>();
 
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
@@ -26,7 +31,6 @@ namespace DailyQuote.WebAPI
 
             app.UseRouting();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
