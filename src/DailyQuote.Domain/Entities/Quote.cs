@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace DailyQuote.Domain.Entities
 {
@@ -11,8 +6,11 @@ namespace DailyQuote.Domain.Entities
     {
         [Key]
         public Guid QuoteId { get; set; }
+
         public string? QuoteContent { get; set; }
+
         public QuoteType? QuoteType { get; set; }
+
         public DateTime? LastShownTime { get; set; }
     }
 

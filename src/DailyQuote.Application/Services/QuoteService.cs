@@ -1,13 +1,7 @@
-﻿using DailyQuote.Application.ServiceContracts;
+﻿using DailyQuote.Application.DTO;
+using DailyQuote.Application.ServiceContracts;
 using DailyQuote.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DailyQuote.Domain;
 using DailyQuote.Domain.RepositoryContracts;
-using DailyQuote.Application.DTO;
 
 namespace DailyQuote.Application.Services
 {
@@ -22,47 +16,55 @@ namespace DailyQuote.Application.Services
 
         public async Task AddQuoteAsync(QuoteAddRequest quote)
         {
-            if (quote == null)
+            if (quote is null)
             {
                 throw new ArgumentNullException(nameof(quote));
             }
 
-            await _quoteRepository.AddQuoteAsync(quote.ToQuote());
+            await _quoteRepository.AddAsync(quote.ToQuote());
         }
 
-        public async Task DeleteQuoteAsync(QuoteDeleteRequest quote)
+        public async Task DeleteQuoteAsync(Guid quoteId)
         {
-            if (quote == null)
+            Quote? quote = await _quoteRepository.GetByIdAsync(quoteId);
+
+            if (quote is null)
             {
-                throw new ArgumentNullException(nameof(quote));
+                throw new KeyNotFoundException("Unable to delete because quote does not exist");
             }
 
-            await _quoteRepository.DeleteQuoteAsync(quote.ToQuote());
+            await _quoteRepository.DeleteAsync(quote);
         }
 
         public async Task<List<QuoteResponse>> GetAllQuotesAsync()
         {
-            List<Quote> quotes = await _quoteRepository.GetAllQuotesAsync();
+            IEnumerable<Quote> quotes = await _quoteRepository.GetAllAsync();
 
             return quotes.Select(quote => quote.ToQuoteResponse()).ToList();
         }
 
         public async Task<QuoteResponse?> GetQuoteByIdAsync(Guid quoteId)
         {
-            if (quoteId == Guid.Empty)
+            Quote? quote = await _quoteRepository.GetByIdAsync(quoteId);
+
+            if (quote is null)
             {
-                throw new ArgumentNullException(nameof(quoteId));
+                throw new KeyNotFoundException("Quote does not exist");
             }
 
-            return (await _quoteRepository.GetQuoteByQuoteIdAsync(quoteId)).ToQuoteResponse();
+            return quote.ToQuoteResponse();
         }
 
         public async Task<QuoteResponse> GetRandomQuoteAsync()
         {
-            Random random = new Random();
-            int recordsCount = await _quoteRepository.GetRecordsCountAsync();
+            IEnumerable<Quote> quotes = await _quoteRepository.GetRandomAsync();
 
-            return (await _quoteRepository.GetRandomQuoteAsync(random.Next(0, recordsCount))).ToQuoteResponse();
+            if (quotes.Count() == 0)
+            {
+                throw new InvalidOperationException("Quotes collection does not contain elements");
+            }
+
+            return quotes.First().ToQuoteResponse();
         }
     }
 }

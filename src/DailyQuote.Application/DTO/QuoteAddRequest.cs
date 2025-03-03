@@ -1,25 +1,25 @@
 ﻿using DailyQuote.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DailyQuote.Application.DTO
 {
     public class QuoteAddRequest
     {
-        public Guid QuoteId { get; set; }
-        public string? QuoteContent { get; set; }
-        public QuoteType? QuoteType { get; set; }
+        public string? Content { get; set; }
+
+        public string? Type { get; set; }
 
         public Quote ToQuote()
         {
+            if (!Enum.IsDefined(typeof(QuoteType), Type))
+            {
+                throw new ArgumentException("Provided type does not exist");
+            }
+
             return new Quote()
             {
-                QuoteId = QuoteId,
-                QuoteContent = QuoteContent,
-                QuoteType = QuoteType
+                QuoteId = Guid.NewGuid(),
+                QuoteContent = Content,
+                QuoteType = (QuoteType)Enum.Parse(typeof(QuoteType), Type)
             };
         }
     }
