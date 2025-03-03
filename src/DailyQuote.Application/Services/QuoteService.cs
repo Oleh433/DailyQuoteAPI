@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DailyQuote.Domain;
 using DailyQuote.Domain.RepositoryContracts;
+using DailyQuote.Application.DTO;
 
 namespace DailyQuote.Application.Services
 {
@@ -19,47 +20,49 @@ namespace DailyQuote.Application.Services
             _quoteRepository = quoteRepository;
         }
 
-        public async Task AddQuoteAsync(Quote quote)
+        public async Task AddQuoteAsync(QuoteAddRequest quote)
         {
             if (quote == null)
             {
                 throw new ArgumentNullException(nameof(quote));
             }
 
-            await _quoteRepository.AddQuoteAsync(quote);
+            await _quoteRepository.AddQuoteAsync(quote.ToQuote());
         }
 
-        public async Task DeleteQuoteAsync(Quote quote)
+        public async Task DeleteQuoteAsync(QuoteDeleteRequest quote)
         {
             if (quote == null)
             {
                 throw new ArgumentNullException(nameof(quote));
             }
 
-            await _quoteRepository.DeleteQuoteAsync(quote);
+            await _quoteRepository.DeleteQuoteAsync(quote.ToQuote());
         }
 
-        public async Task<List<Quote>> GetAllQuotesAsync()
+        public async Task<List<QuoteResponse>> GetAllQuotesAsync()
         {
-            throw new NotImplementedException();
+            List<Quote> quotes = await _quoteRepository.GetAllQuotesAsync();
+
+            return quotes.Select(quote => quote.ToQuoteResponse()).ToList();
         }
 
-        public async Task<Quote?> GetQuoteByQuoteIdAsync(Guid quoteId)
+        public async Task<QuoteResponse?> GetQuoteByIdAsync(Guid quoteId)
         {
             if (quoteId == Guid.Empty)
             {
                 throw new ArgumentNullException(nameof(quoteId));
             }
 
-            return await _quoteRepository.GetQuoteByQuoteIdAsync(quoteId);
+            return (await _quoteRepository.GetQuoteByQuoteIdAsync(quoteId)).ToQuoteResponse();
         }
 
-        public async Task<Quote> GetRandomQuoteAsync()
+        public async Task<QuoteResponse> GetRandomQuoteAsync()
         {
             Random random = new Random();
             int recordsCount = await _quoteRepository.GetRecordsCountAsync();
 
-            return await _quoteRepository.GetRandomQuoteAsync(random.Next(0, recordsCount));
+            return (await _quoteRepository.GetRandomQuoteAsync(random.Next(0, recordsCount))).ToQuoteResponse();
         }
     }
 }
