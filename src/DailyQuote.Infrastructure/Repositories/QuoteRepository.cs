@@ -39,5 +39,15 @@ namespace DailyQuote.Infrastructure.Repositories
             _db.Quotes.Remove(quote);
             await _db.SaveChangesAsync();
         }
+
+        public async Task<Quote?> GetRandomQuoteAsync(int quoteNumber)
+        {
+            return await _db.Quotes.Skip(quoteNumber).FirstOrDefaultAsync();
+        }
+
+        public async Task<int> GetRecordsCountAsync()
+        {
+            return await _db.Quotes.CountAsync();
+        }
     }
 }
