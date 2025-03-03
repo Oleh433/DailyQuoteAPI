@@ -1,4 +1,7 @@
 
+using DailyQuote.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+
 namespace DailyQuote.WebAPI
 {
     public class Program
@@ -13,6 +16,11 @@ namespace DailyQuote.WebAPI
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DatabaseConnectionString"));
+            });
 
             var app = builder.Build();
 
