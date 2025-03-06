@@ -23,7 +23,7 @@ namespace DailyQuote.WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Quotes(QuoteAddRequest quoteAddRequest)
+        public async Task<IActionResult> Quotes([FromBody] QuoteAddRequest quoteAddRequest)
         {
             await _quoteService.AddQuoteAsync(quoteAddRequest);
 

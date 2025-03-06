@@ -10,11 +10,6 @@ namespace DailyQuote.Application.DTO
 
         public Quote ToQuote()
         {
-            if (!Enum.IsDefined(typeof(QuoteType), Type))
-            {
-                throw new ArgumentException("Provided type does not exist");
-            }
-
             return new Quote()
             {
                 QuoteId = Guid.NewGuid(),
