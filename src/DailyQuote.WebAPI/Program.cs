@@ -1,9 +1,15 @@
 using DailyQuote.Application.ServiceContracts;
 using DailyQuote.Application.Services;
+using DailyQuote.Domain.IdentityEntities;
 using DailyQuote.Domain.RepositoryContracts;
 using DailyQuote.Infrastructure;
 using DailyQuote.Infrastructure.Repositories;
+using FluentValidation;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
+using System.Globalization;
 
 namespace DailyQuote.WebAPI
 {
@@ -17,15 +23,28 @@ namespace DailyQuote.WebAPI
 
             builder.Services.AddScoped<IQuoteService, QuoteService>();
 
+            builder.Services.AddScoped<IUserService, UserService>();
+
             builder.Services.AddControllers();
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            builder.Services.AddValidatorsFromAssemblyContaining<QuoteService>();
+            builder.Services.AddFluentValidationAutoValidation();
+
+            builder.Services.AddValidatorsFromAssembly(typeof(QuoteService).Assembly);
+
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DatabaseConnectionString"));
             });
+
+            builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                    .AddDefaultTokenProviders()
+                        .AddUserStore<UserStore<ApplicationUser, ApplicationRole, ApplicationDbContext, Guid>>()
+                            .AddRoleStore<RoleStore<ApplicationRole, ApplicationDbContext, Guid>>();
 
             var app = builder.Build();
 
