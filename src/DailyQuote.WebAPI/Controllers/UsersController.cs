@@ -19,9 +19,34 @@ namespace DailyQuote.WebAPI.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] UserRegisterRequest userRegisterRequest)
         {
-            await _userService.Register(userRegisterRequest);
+            await _userService.RegisterAsync(userRegisterRequest);
+
+            UserSignInRequest userSignInRequest = new UserSignInRequest()
+            {
+                Email = userRegisterRequest.Email,
+                Password = userRegisterRequest.Password
+            };
+
+            await _userService.SignInAsync(userSignInRequest);
 
             return Created();
+        }
+
+        //Method?
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] UserSignInRequest userSignInRequest)
+        {
+            await _userService.SignInAsync(userSignInRequest);
+
+            return Ok();
+        }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            await _userService.SignOutAsync();
+
+            return Ok();
         }
     }
 }
