@@ -8,13 +8,15 @@ namespace DailyQuote.Application.Services
     public class UserService : IUserService
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public UserService(UserManager<ApplicationUser> userManager)
+        public UserService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
         {
             _userManager = userManager;
+            _signInManager = signInManager;
         }
 
-        public async Task Register(UserRegisterRequest userRegisterRequest)
+        public async Task RegisterAsync(UserRegisterRequest userRegisterRequest)
         {
             ApplicationUser user = new ApplicationUser()
             {
@@ -28,6 +30,21 @@ namespace DailyQuote.Application.Services
             {
                 throw new InvalidOperationException(string.Join(", ", result.Errors.Select(error => error.Description)));
             }
+        }
+
+        public async Task SignInAsync(UserSignInRequest userSignInRequest)
+        {
+            SignInResult signInResult = await _signInManager.PasswordSignInAsync(userSignInRequest.Email, userSignInRequest.Password, false, false);
+
+            if (!signInResult.Succeeded)
+            {
+                throw new InvalidOperationException(signInResult.ToString());
+            }
+        }
+
+        public async Task SignOutAsync()
+        {
+            await _signInManager.SignOutAsync();
         }
     }
 }

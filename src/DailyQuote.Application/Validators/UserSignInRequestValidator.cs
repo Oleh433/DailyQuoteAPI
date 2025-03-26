@@ -1,15 +1,20 @@
 ﻿using DailyQuote.Application.DTO;
 using FluentValidation;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace DailyQuote.Application.Validators
 {
-    public class UserRegisterRequestValidator : AbstractValidator<UserRegisterRequest>
+    public class UserSignInRequestValidator : AbstractValidator<UserSignInRequest>
     {
-        public UserRegisterRequestValidator()
+        public UserSignInRequestValidator()
         {
             RuleFor(x => x.Email)
                 .EmailAddress().WithMessage("Email should be valid email address")
-                .NotEmpty().WithMessage("Email should not be empty");
+                .NotEmpty().WithMessage("Email should be empty");
 
             RuleFor(x => x.Password)
                 .NotEmpty().WithMessage("Password should not be empty")

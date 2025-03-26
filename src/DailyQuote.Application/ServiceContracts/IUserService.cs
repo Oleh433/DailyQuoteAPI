@@ -4,6 +4,10 @@ namespace DailyQuote.Application.ServiceContracts
 {
     public interface IUserService
     {
-        Task Register(UserRegisterRequest userRegisterRequest);
+        Task RegisterAsync(UserRegisterRequest userRegisterRequest);
+
+        Task SignInAsync(UserSignInRequest userSignInRequest);
+
+        Task SignOutAsync();
     }
 }
