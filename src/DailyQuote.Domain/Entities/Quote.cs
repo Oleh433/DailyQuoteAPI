@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using DailyQuote.Domain.Enums;
 
 namespace DailyQuote.Domain.Entities
 {
@@ -12,14 +13,5 @@ namespace DailyQuote.Domain.Entities
         public QuoteType? QuoteType { get; set; }
 
         public DateTime? LastShownTime { get; set; }
-    }
-
-    public enum QuoteType
-    {
-        Motivational,
-        Humor,
-        Philosophical,
-        Love,
-        Life
     }
 }

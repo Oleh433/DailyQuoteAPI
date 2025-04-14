@@ -1,7 +1,7 @@
 ﻿using DailyQuote.Application.DTO;
 using DailyQuote.Application.ServiceContracts;
-using DailyQuote.Domain.IdentityEntities;
-using Microsoft.AspNetCore.Identity;
+using DailyQuote.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DailyQuote.WebAPI.Controllers
@@ -16,25 +16,28 @@ namespace DailyQuote.WebAPI.Controllers
             _userService = userService;
         }
 
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] UserRegisterRequest userRegisterRequest)
+        [HttpPost("register-user")]
+        public async Task<IActionResult> RegisterUser(
+            [FromBody] UserRegisterRequest userRegisterRequest)
         {
-            await _userService.RegisterAsync(userRegisterRequest);
-
-            UserSignInRequest userSignInRequest = new UserSignInRequest()
-            {
-                Email = userRegisterRequest.Email,
-                Password = userRegisterRequest.Password
-            };
-
-            await _userService.SignInAsync(userSignInRequest);
+            await _userService.UserRegisterAsync(userRegisterRequest);
 
             return Created();
         }
 
-        //Method?
+        [HttpPost("register-admin")]
+        [Authorize(Roles = "Owner")]
+        public async Task<IActionResult> RegisterAdmin(
+            [FromBody] UserRegisterRequest userRegisterRequest)
+        {
+            await _userService.AdminRegisterAsync(userRegisterRequest);
+
+            return Created();
+        }
+
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] UserSignInRequest userSignInRequest)
+        public async Task<IActionResult> Login(
+            [FromBody] UserSignInRequest userSignInRequest)
         {
             await _userService.SignInAsync(userSignInRequest);
 
@@ -42,10 +45,11 @@ namespace DailyQuote.WebAPI.Controllers
         }
 
         [HttpPost("logout")]
+        [Authorize]
         public async Task<IActionResult> Logout()
         {
             await _userService.SignOutAsync();
-
+            
             return Ok();
         }
     }

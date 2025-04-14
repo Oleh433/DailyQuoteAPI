@@ -3,19 +3,19 @@ using DailyQuote.Application.Services;
 using DailyQuote.Domain.IdentityEntities;
 using DailyQuote.Domain.RepositoryContracts;
 using DailyQuote.Infrastructure;
+using DailyQuote.Infrastructure.Identity;
 using DailyQuote.Infrastructure.Repositories;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
-using System.Globalization;
 
 namespace DailyQuote.WebAPI
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +24,10 @@ namespace DailyQuote.WebAPI
             builder.Services.AddScoped<IQuoteService, QuoteService>();
 
             builder.Services.AddScoped<IUserService, UserService>();
+
+            builder.Services.AddScoped<IdentityInitializer>();
+
+            builder.Services.AddHttpContextAccessor();
 
             builder.Services.AddControllers();
 
@@ -47,6 +51,13 @@ namespace DailyQuote.WebAPI
                             .AddRoleStore<RoleStore<ApplicationRole, ApplicationDbContext, Guid>>();
 
             var app = builder.Build();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var initializer = scope.ServiceProvider.GetRequiredService<IdentityInitializer>();
+                await initializer.CreateRolesAsync();
+                await initializer.AddOwnerAsync();
+            }
 
             app.UseRouting();
 

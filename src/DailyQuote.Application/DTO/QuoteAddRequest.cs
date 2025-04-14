@@ -1,4 +1,5 @@
 ﻿using DailyQuote.Domain.Entities;
+using DailyQuote.Domain.Enums;
 
 namespace DailyQuote.Application.DTO
 {
