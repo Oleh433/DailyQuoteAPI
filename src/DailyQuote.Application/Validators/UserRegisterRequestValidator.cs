@@ -1,4 +1,5 @@
 ﻿using DailyQuote.Application.DTO;
+using DailyQuote.Domain.Enums;
 using FluentValidation;
 
 namespace DailyQuote.Application.Validators
