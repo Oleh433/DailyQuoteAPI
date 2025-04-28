@@ -15,9 +15,9 @@ namespace DailyQuote.Application.DTO
         {
             return new Quote()
             {
-                QuoteId = QuoteId,
-                QuoteContent = QuoteContent,
-                QuoteType = QuoteType
+                Id = QuoteId,
+                Content = QuoteContent,
+                Type = QuoteType.Value
             };
         }
     }

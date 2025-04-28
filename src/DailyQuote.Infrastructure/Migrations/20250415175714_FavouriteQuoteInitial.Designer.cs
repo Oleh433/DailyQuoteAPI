@@ -4,6 +4,7 @@ using DailyQuote.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DailyQuote.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250415175714_FavouriteQuoteInitial")]
+    partial class FavouriteQuoteInitial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,26 +27,25 @@ namespace DailyQuote.Infrastructure.Migrations
 
             modelBuilder.Entity("DailyQuote.Domain.Entities.Quote", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("QuoteId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("ApplicationUserId")
+                    b.Property<Guid?>("FavouriteQuotesId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("LastShownTime")
+                    b.Property<DateTime?>("LastShownTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Type")
+                    b.Property<string>("QuoteContent")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("QuoteType")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.HasKey("QuoteId");
 
-                    b.HasIndex("ApplicationUserId");
+                    b.HasIndex("FavouriteQuotesId");
 
                     b.ToTable("Quotes", (string)null);
                 });
@@ -95,6 +97,10 @@ namespace DailyQuote.Infrastructure.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("FavouriteQuotesId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -252,7 +258,7 @@ namespace DailyQuote.Infrastructure.Migrations
                 {
                     b.HasOne("DailyQuote.Domain.IdentityEntities.ApplicationUser", null)
                         .WithMany("FavouriteQuotes")
-                        .HasForeignKey("ApplicationUserId");
+                        .HasForeignKey("FavouriteQuotesId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>

@@ -42,5 +42,29 @@ namespace DailyQuote.WebAPI.Controllers
 
             return NoContent();
         }
+
+        [HttpPost("mark-as-favourite/{quoteId:guid}")]
+        public async Task<IActionResult> MarkAsFavourite(Guid quoteId)
+        {
+            await _quoteService.AddToFavouriteAsync(quoteId);
+
+            return Ok();
+        }
+
+        [HttpPost("unmark-from-favourite/{quoteId:guid}")]
+        public async Task<IActionResult> UnmarkFromFavourite(Guid quoteId)
+        {
+            await _quoteService.RemoveFromFavouriteAsync(quoteId);
+
+            return Ok();
+        }
+
+        [HttpGet("get-favourite")]
+        public async Task<IActionResult> GetFavourite()
+        {
+            List<QuoteResponse> favouriteQuotes = await _quoteService.GetFavouriteAsync();
+
+            return Json(favouriteQuotes);
+        }
     }
 }

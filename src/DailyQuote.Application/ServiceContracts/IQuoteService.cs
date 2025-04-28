@@ -13,5 +13,11 @@ namespace DailyQuote.Application.ServiceContracts
         Task DeleteQuoteAsync(Guid quoteId);
 
         Task<QuoteResponse> GetRandomQuoteAsync();
+
+        Task AddToFavouriteAsync(Guid quoteId);
+
+        Task RemoveFromFavouriteAsync(Guid quoteId);
+
+        Task<List<QuoteResponse>> GetFavouriteAsync();
     }
 }

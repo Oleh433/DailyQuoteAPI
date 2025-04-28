@@ -13,9 +13,9 @@ namespace DailyQuote.Application.DTO
         {
             return new Quote()
             {
-                QuoteId = Guid.NewGuid(),
-                QuoteContent = Content,
-                QuoteType = (QuoteType)Enum.Parse(typeof(QuoteType), Type)
+                Id = Guid.NewGuid(),
+                Content = Content,
+                Type = (QuoteType)Enum.Parse(typeof(QuoteType), Type)
             };
         }
     }

@@ -4,8 +4,6 @@ using DailyQuote.Domain.Enums;
 using DailyQuote.Domain.IdentityEntities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 
 namespace DailyQuote.Application.Services
 {
@@ -15,14 +13,11 @@ namespace DailyQuote.Application.Services
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
 
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
         public UserService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<ApplicationRole> roleManager, IHttpContextAccessor httpContextAccessor)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
-            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task UserRegisterAsync(UserRegisterRequest userRegisterRequest)
@@ -34,7 +29,7 @@ namespace DailyQuote.Application.Services
             };
 
             IdentityResult userRegistrationResult = await _userManager.CreateAsync(user, userRegisterRequest.Password);
-            
+
             if (!userRegistrationResult.Succeeded)
             {
                 throw new InvalidOperationException(string.Join(", ", userRegistrationResult.Errors.Select(error => error.Description)));
@@ -74,9 +69,9 @@ namespace DailyQuote.Application.Services
         public async Task SignInAsync(UserSignInRequest userSignInRequest)
         {
             SignInResult signInResult = await _signInManager.PasswordSignInAsync(
-                userSignInRequest.Email, 
-                userSignInRequest.Password, 
-                false, 
+                userSignInRequest.Email,
+                userSignInRequest.Password,
+                false,
                 false);
 
             if (!signInResult.Succeeded)
