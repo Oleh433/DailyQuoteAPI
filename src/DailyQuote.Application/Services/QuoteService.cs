@@ -1,27 +1,36 @@
 ﻿using DailyQuote.Application.DTO;
 using DailyQuote.Application.ServiceContracts;
 using DailyQuote.Domain.Entities;
+using DailyQuote.Domain.IdentityEntities;
 using DailyQuote.Domain.RepositoryContracts;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace DailyQuote.Application.Services
 {
     public class QuoteService : IQuoteService
     {
         private readonly IQuoteRepository _quoteRepository;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public QuoteService(IQuoteRepository quoteRepository)
+        public QuoteService(IQuoteRepository quoteRepository, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
         {
             _quoteRepository = quoteRepository;
+            _userManager = userManager;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task AddQuoteAsync(QuoteAddRequest quote)
+        public async Task AddQuoteAsync(QuoteAddRequest quoteAddRequest)
         {
-            if (quote is null)
+            if (quoteAddRequest is null)
             {
-                throw new ArgumentNullException(nameof(quote));
+                throw new ArgumentNullException(nameof(quoteAddRequest));
             }
 
-            await _quoteRepository.AddAsync(quote.ToQuote());
+            Quote quote = quoteAddRequest.ToQuote();
+            await _quoteRepository.AddAsync(quote);
         }
 
         public async Task DeleteQuoteAsync(Guid quoteId)
@@ -65,6 +74,59 @@ namespace DailyQuote.Application.Services
             }
 
             return quotes.First().ToQuoteResponse();
+        }
+
+        public async Task AddToFavouriteAsync(Guid quoteId)
+        {
+            Quote? quote = await _quoteRepository.GetByIdAsync(quoteId);
+
+            if (quote is null)
+            {
+                throw new KeyNotFoundException("Quote does not exist");
+            }
+
+            Guid currentUserId = Guid.Parse(
+                _userManager.GetUserId(_httpContextAccessor.HttpContext.User));
+
+            ApplicationUser user = await _userManager.Users
+                .FirstAsync(user => user.Id == currentUserId);
+
+            user.FavouriteQuotes.Add(quote);
+            await _userManager.UpdateAsync(user);
+        }
+
+        public async Task RemoveFromFavouriteAsync(Guid quoteId)
+        {
+            Quote? quote = await _quoteRepository.GetByIdAsync(quoteId);
+
+            if (quote is null)
+            {
+                throw new KeyNotFoundException("Quote does not exist");
+            }
+
+            Guid currentUserId = Guid.Parse(
+                _userManager.GetUserId(_httpContextAccessor.HttpContext.User));
+
+            ApplicationUser user = await _userManager.Users
+                .FirstAsync(user => user.Id == currentUserId);
+
+            user.FavouriteQuotes.Remove(quote);
+            await _userManager.UpdateAsync(user);
+        }
+
+        public async Task<List<QuoteResponse>> GetFavouriteAsync()
+        {
+            Guid currentUserId = Guid.Parse(
+                _userManager.GetUserId(_httpContextAccessor.HttpContext.User));
+
+            ApplicationUser user = await _userManager.Users
+                .Include(user => user.FavouriteQuotes)
+                .FirstAsync(user => user.Id == currentUserId);
+
+            List<QuoteResponse> favouriteQuotes = user.FavouriteQuotes
+                .Select(quote => quote.ToQuoteResponse()).ToList();
+
+            return favouriteQuotes;
         }
     }
 }

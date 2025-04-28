@@ -17,9 +17,9 @@ namespace DailyQuote.Application.DTO
         {
             return new QuoteResponse
             {
-                Id = quote.QuoteId,
-                Content = quote.QuoteContent,
-                Type = quote.QuoteType.ToString()
+                Id = quote.Id,
+                Content = quote.Content,
+                Type = quote.Type.ToString()
             };
         }
     }

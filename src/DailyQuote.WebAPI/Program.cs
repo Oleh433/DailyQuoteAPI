@@ -42,6 +42,7 @@ namespace DailyQuote.WebAPI
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DatabaseConnectionString"));
+                //options.UseSqlServer(builder.Configuration["AzureDbConnectionString"]);
             });
 
             builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
