@@ -22,5 +22,15 @@ namespace DailyQuote.Application.DTO
                 Type = quote.Type.ToString()
             };
         }
+
+        public static QuoteResponse ToQuoteResponse(this UserQuote userQuote)
+        {
+            return new QuoteResponse
+            {
+                Id = userQuote.Id,
+                Content = userQuote.Content,
+                Type = userQuote.Type.ToString()
+            };
+        }
     }
 }

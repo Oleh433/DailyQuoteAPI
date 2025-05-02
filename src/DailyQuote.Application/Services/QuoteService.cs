@@ -12,14 +12,16 @@ namespace DailyQuote.Application.Services
     public class QuoteService : IQuoteService
     {
         private readonly IQuoteRepository _quoteRepository;
+        private readonly IUserQuoteRepository _userQuoteRepository;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public QuoteService(IQuoteRepository quoteRepository, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
+        public QuoteService(IQuoteRepository quoteRepository, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor, IUserQuoteRepository userQuoteRepository)
         {
             _quoteRepository = quoteRepository;
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
+            _userQuoteRepository = userQuoteRepository;
         }
 
         public async Task AddQuoteAsync(QuoteAddRequest quoteAddRequest)
