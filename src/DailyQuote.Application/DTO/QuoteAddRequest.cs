@@ -18,5 +18,15 @@ namespace DailyQuote.Application.DTO
                 Type = (QuoteType)Enum.Parse(typeof(QuoteType), Type)
             };
         }
+
+        public UserQuote ToUserQuote()
+        {
+            return new UserQuote()
+            {
+                Id = Guid.NewGuid(),
+                Content = Content,
+                Type = (QuoteType)Enum.Parse(typeof(QuoteType), Type)
+            };
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using DailyQuote.Application.DTO;
 using DailyQuote.Application.ServiceContracts;
+using DailyQuote.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,10 +11,12 @@ namespace DailyQuote.WebAPI.Controllers
     public class QuotesController : Controller
     {
         private readonly IQuoteService _quoteService;
+        private readonly IUserQuoteService _userQuoteService;
 
-        public QuotesController(IQuoteService quoteService)
+        public QuotesController(IQuoteService quoteService, IUserQuoteService userQuoteService)
         {
             _quoteService = quoteService;
+            _userQuoteService = userQuoteService;
         }
 
         [HttpGet("random")]
@@ -43,7 +46,7 @@ namespace DailyQuote.WebAPI.Controllers
             return NoContent();
         }
 
-        [HttpPost("mark-as-favourite/{quoteId:guid}")]
+        [HttpPut("{quoteId:guid}/mark-as-favourite")]
         public async Task<IActionResult> MarkAsFavourite(Guid quoteId)
         {
             await _quoteService.AddToFavouriteAsync(quoteId);
@@ -51,7 +54,7 @@ namespace DailyQuote.WebAPI.Controllers
             return Ok();
         }
 
-        [HttpPost("unmark-from-favourite/{quoteId:guid}")]
+        [HttpPut("{quoteId:guid}/unmark-from-favourite")]
         public async Task<IActionResult> UnmarkFromFavourite(Guid quoteId)
         {
             await _quoteService.RemoveFromFavouriteAsync(quoteId);
@@ -59,12 +62,49 @@ namespace DailyQuote.WebAPI.Controllers
             return Ok();
         }
 
-        [HttpGet("get-favourite")]
+        [HttpGet("favourite")]
         public async Task<IActionResult> GetFavourite()
         {
-            List<QuoteResponse> favouriteQuotes = await _quoteService.GetFavouriteAsync();
+            List<QuoteResponse> favouriteQuotes = await _quoteService
+                .GetFavouriteAsync();
 
             return Json(favouriteQuotes);
+        }
+
+        [HttpPost("submit")]
+        public async Task<IActionResult> Submit(QuoteAddRequest quoteAddRequest)
+        {
+            await _userQuoteService.AddQuoteAsync(quoteAddRequest);
+
+            return Ok();
+        }
+
+        [Authorize(Roles = "Admin,Owner")]
+        [HttpPost("{quoteId}/approve")]
+        public async Task<IActionResult> ApprovePendingQuote(Guid quoteId)
+        {
+            await _userQuoteService.ApproveQuoteAsync(quoteId);
+
+            return Ok();
+        }
+
+        [Authorize(Roles = "Admin,Owner")]
+        [HttpDelete("{quoteId}/reject")]
+        public async Task<IActionResult> RejectPendingQuote(Guid quoteId)
+        {
+            await _userQuoteService.RejectQuoteAsync(quoteId);
+
+            return Ok();
+        }
+
+        [Authorize(Roles = "Admin,Owner")]
+        [HttpGet("pending")] 
+        public async Task<IActionResult> GetAllPendingQuotes()
+        {
+            IEnumerable<QuoteResponse> quotes = await _userQuoteService
+                .GetAllAsync();
+
+            return Json(quotes);
         }
     }
 }
