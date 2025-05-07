@@ -9,6 +9,7 @@ namespace DailyQuote.Infrastructure
     {
         public DbSet<Quote> Quotes { get; set; }
         public DbSet<UserQuote> UserQuotes { get; set; }
+        public DbSet<SubscribedUser> SubscribedUsers { get; set; }
  
         public ApplicationDbContext(DbContextOptions options) : base(options) { }
 
@@ -19,6 +20,8 @@ namespace DailyQuote.Infrastructure
             modelBuilder.Entity<Quote>().ToTable("Quotes");
 
             modelBuilder.Entity<UserQuote>().ToTable("PendingQuotes");
+
+            modelBuilder.Entity<SubscribedUser>().ToTable("SubscribedUsers");
         }
     }
 }

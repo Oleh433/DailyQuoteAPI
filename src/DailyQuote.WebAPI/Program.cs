@@ -23,11 +23,15 @@ namespace DailyQuote.WebAPI
 
             builder.Services.AddScoped<IUserQuoteRepository, UserQuoteRepository>();
 
+            builder.Services.AddScoped<ISubscribedUserRepository, SubscribedUserRepository>();
+
             builder.Services.AddScoped<IQuoteService, QuoteService>();
 
             builder.Services.AddScoped<IUserService, UserService>();
 
             builder.Services.AddScoped<IUserQuoteService, UserQuoteService>();
+
+            builder.Services.AddScoped<ISubscribedUserService, SubscribedUserService>();
 
             builder.Services.AddScoped<IdentityInitializer>();
 
