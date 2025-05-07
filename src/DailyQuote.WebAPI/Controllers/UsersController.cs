@@ -10,10 +10,12 @@ namespace DailyQuote.WebAPI.Controllers
     public class UsersController : Controller
     {
         private readonly IUserService _userService;
+        private readonly ISubscribedUserService _subscribedUserService;
 
-        public UsersController(IUserService userService)
+        public UsersController(IUserService userService, ISubscribedUserService subscribedUserService)
         {
             _userService = userService;
+            _subscribedUserService = subscribedUserService;
         }
 
         [HttpPost("register-user")]
@@ -50,6 +52,22 @@ namespace DailyQuote.WebAPI.Controllers
         {
             await _userService.SignOutAsync();
             
+            return Ok();
+        }
+
+        [HttpPost("subscribe")]
+        public async Task<IActionResult> Subscribe([FromBody] string email)
+        {
+            await _subscribedUserService.SubscribeAsync(email);
+
+            return Ok();
+        }
+
+        [HttpPut("unsubscribe")]
+        public async Task<IActionResult> Unubscribe([FromBody] string email)
+        {
+            await _subscribedUserService.UnsubscribeAsync(email);
+
             return Ok();
         }
     }
