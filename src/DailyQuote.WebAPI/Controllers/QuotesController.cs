@@ -1,6 +1,7 @@
 ﻿using DailyQuote.Application.DTO;
 using DailyQuote.Application.ServiceContracts;
 using DailyQuote.Application.Services;
+using DailyQuote.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,10 +14,13 @@ namespace DailyQuote.WebAPI.Controllers
         private readonly IQuoteService _quoteService;
         private readonly IUserQuoteService _userQuoteService;
 
-        public QuotesController(IQuoteService quoteService, IUserQuoteService userQuoteService)
+        private readonly IEmailSendingService _emailSendingService;
+
+        public QuotesController(IQuoteService quoteService, IUserQuoteService userQuoteService, IEmailSendingService emailSendingService)
         {
             _quoteService = quoteService;
             _userQuoteService = userQuoteService;
+            _emailSendingService = emailSendingService;
         }
 
         [HttpGet("random")]
@@ -105,6 +109,21 @@ namespace DailyQuote.WebAPI.Controllers
                 .GetAllAsync();
 
             return Json(quotes);
+        }
+
+        [HttpGet("send-test")]
+        public async Task<IActionResult> Send()
+        {
+            QuoteResponse quoteResponse = new QuoteResponse()
+            {
+                Id = new Guid(),
+                Content = "You can!",
+                Type = QuoteType.Motivational.ToString()
+            };
+
+            await _emailSendingService.SendQuoteAsync(quoteResponse, "pobyvanets2005@gmail.com");
+
+            return Ok();
         }
     }
 }

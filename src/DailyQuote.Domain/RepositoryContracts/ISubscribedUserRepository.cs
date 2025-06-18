@@ -14,5 +14,7 @@ namespace DailyQuote.Domain.RepositoryContracts
         Task UnsubscribeAsync(SubscribedUser subscribedUser);
 
         Task<bool> IsExistsAsync(string Email);
+
+        Task<IEnumerable<SubscribedUser>> GetAllAsync();
     }
 }
