@@ -5,10 +5,12 @@ using DailyQuote.Domain.RepositoryContracts;
 using DailyQuote.Infrastructure;
 using DailyQuote.Infrastructure.Identity;
 using DailyQuote.Infrastructure.Repositories;
+using DailyQuote.WebAPI.BackgroundTasksProcesors;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Quartz;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 
 namespace DailyQuote.WebAPI
@@ -33,6 +35,8 @@ namespace DailyQuote.WebAPI
 
             builder.Services.AddScoped<ISubscribedUserService, SubscribedUserService>();
 
+            builder.Services.AddScoped<IEmailSendingService, EmailSendingService>();
+
             builder.Services.AddScoped<IdentityInitializer>();
 
             builder.Services.AddHttpContextAccessor();
@@ -50,7 +54,6 @@ namespace DailyQuote.WebAPI
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DatabaseConnectionString"));
-                //options.UseSqlServer(builder.Configuration["AzureDbConnectionString"]);
             });
 
             builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
@@ -58,6 +61,24 @@ namespace DailyQuote.WebAPI
                     .AddDefaultTokenProviders()
                         .AddUserStore<UserStore<ApplicationUser, ApplicationRole, ApplicationDbContext, Guid>>()
                             .AddRoleStore<RoleStore<ApplicationRole, ApplicationDbContext, Guid>>();
+
+            //Quartz
+            builder.Services.AddQuartz(options =>
+            {
+                options.UseMicrosoftDependencyInjectionJobFactory();
+
+                var jobKey = JobKey.Create(nameof(DailyQuoteBackgroundJob));
+
+                options
+                    .AddJob<DailyQuoteBackgroundJob>(jobKey)
+                    .AddTrigger(trigger =>
+                        trigger
+                            .ForJob(jobKey)
+                            .WithIdentity("DailyQuoteTrigger")
+                            .WithCronSchedule("0 0 12 * * ?"));
+            });
+
+            builder.Services.AddQuartzHostedService();
 
             var app = builder.Build();
 

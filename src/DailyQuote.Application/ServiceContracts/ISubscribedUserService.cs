@@ -11,5 +11,7 @@ namespace DailyQuote.Application.ServiceContracts
         Task SubscribeAsync(string email);
 
         Task UnsubscribeAsync(string email);
+
+        Task<IEnumerable<string>> GetAllUsersEmails();
     }
 }

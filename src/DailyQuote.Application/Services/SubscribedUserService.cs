@@ -51,5 +51,14 @@ namespace DailyQuote.Application.Services
 
             await _subscribedUserRepository.UnsubscribeAsync(user);
         }
+
+        public async Task<IEnumerable<string>> GetAllUsersEmails()
+        {
+            IEnumerable<SubscribedUser> subscribedUsers = await _subscribedUserRepository
+                .GetAllAsync();
+
+            return subscribedUsers.Select(user => user.Email);
+        }
     }
 }
+ 

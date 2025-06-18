@@ -1,5 +1,6 @@
 ﻿using DailyQuote.Domain.Entities;
 using DailyQuote.Domain.RepositoryContracts;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 namespace DailyQuote.Infrastructure.Repositories
@@ -31,6 +32,12 @@ namespace DailyQuote.Infrastructure.Repositories
         {
             return _dbContext.SubscribedUsers
                 .Any(user => user.Email == Email);
+        }
+
+        public async Task<IEnumerable<SubscribedUser>> GetAllAsync()
+        {
+            return await _dbContext.SubscribedUsers
+                .ToListAsync();
         }
     }
 }
